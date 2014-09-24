@@ -1,0 +1,70 @@
+[media]
++ id                 { label: "integer" }
+  asset_file_name    { label: "string" }
+  asset_content_type { label: "string" }
+  asset_file_size    { label: "integer" }
+  asset_updated_at   { label: "datetime" }
+  created_at         { label: "datetime" }
+  updated_at         { label: "datetime" }
+
+
+[users]
+* id         { label: "integer" }
++ avatar_id  { label: "integer" }
+  name       { label: "string" } # null: false
+  created_at { label: "datetime" }
+  updated_at { label: "datetime" }
+
+users 1--? media { label: "avatar" } # dependent: :nullify
+
+
+[lunch_boxes]
+* id         { label: "integer" }
++ user_id    { label: "integer" } # null: false, index: true
+  konashi_id { label: "string" }  # null: false, index: true
+  color      { label: "integer" } # limit: 1
+  created_at { label: "datetime" }
+  updated_at { label: "datetime" }
+
+lunch_boxes +--1 users # dependent: :delete
+
+
+[foods]
+* id            { label: "integer" }
++ user_id       { label: "integer" } # null: false, index: true
++ thumbnail_id  { label: "integer" }
+  name          { label: "string" }  # null: false
+  description   { label: "text" }
+  likes_count   { label: "integer" } # null: false, default: 0
+  created_at    { label: "datetime" }
+  updated_at    { label: "datetime" }
+
+foods +--1 users # dependent: :delete
+foods 1--? media { label: "thumbnail" } # dependent: :nullify
+
+
+[exchange_queues]
+* id         { label: "integer" }
++ user_id    { label: "integer" } # null: false, index: true
++ target_id  { label: "integer" } # null: false, index: true
++ food_id    { label: "integer" } # null: false, index: true
+  created_at { label: "datetime" }
+  updated_at { label: "datetime" }
+
+exchange_queues +--1 users # dependent: :delete
+exchange_queues +--1 users { label: "target" } # dependent: :delete
+exchange_queues +--1 foods # dependent: :delete
+
+
+[messages]
+* id         { label: "integer" }
++ user_id    { label: "integer" } # null: false, index: true
++ target_id  { label: "integer" } # null: false, index: true
++ food_id    { label: "integer" } # null: false, index: true
+  body       { label: "text" }
+  created_at { label: "datetime" }
+  updated_at { label: "datetime" }
+
+messages +--1 users # dependent: :delete
+messages +--1 users { label: "target" } # dependent: :delete
+messages +--1 foods # dependent: :delete

@@ -1,0 +1,16 @@
+.DS_Store
+
+/.bundle
+/vendor/bundle
+
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+/log/*.log
+/tmp
+
+/db/schema.rb
+
+/public/system
+/public/assets
+
