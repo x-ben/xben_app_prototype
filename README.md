@@ -17,8 +17,8 @@ $ ./script/setup
 Update
 ------
 
-```sh
 After git pull, run this command:
 
+```sh
 $ ./script/update
 ```
