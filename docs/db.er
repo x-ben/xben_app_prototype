@@ -1,10 +1,12 @@
 [deals]
-* id        { label: "integer" }
-+ user_1_id { label: "integer" } # null: false, index: true
-+ user_2_id { label: "integer" } # null: false, index: true
-+ food_1_id { label: "integer" } # null: false, index: true
-+ food_2_id { label: "integer" } # null: false, index: true
-  status    { label: "integer" } # limit: 1, null: false, default: 0
+* id         { label: "integer" }
++ user_1_id  { label: "integer" } # null: false, index: true
++ user_2_id  { label: "integer" } # null: false, index: true
++ food_1_id  { label: "integer" } # null: false, index: true
++ food_2_id  { label: "integer" } # null: false, index: true
+  status     { label: "integer" } # limit: 1, null: false, default: 0
+  created_at { label: "datetime" }
+  updated_at { label: "datetime" }
 
 deals +--1 users { label: "user_1" } # dependent: :delete
 deals +--1 users { label: "user_2" } # dependent: :delete

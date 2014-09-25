@@ -38,6 +38,7 @@ GEM
       rake (>= 0.8.7)
     arel (5.0.1.20140414130214)
     awesome_print (1.2.0)
+    bcrypt (3.1.7)
     better_errors (2.0.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
@@ -69,6 +70,12 @@ GEM
     daemons (1.1.9)
     debug_inspector (0.0.2)
     debugger-linecache (1.2.0)
+    devise (3.3.0)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
     diff-lcs (1.2.5)
     em-synchrony (1.0.3)
       eventmachine (>= 1.0.0.beta.1)
@@ -109,6 +116,7 @@ GEM
     multi_json (1.10.1)
     mysql2 (0.3.16)
     oj (2.10.2)
+    orm_adapter (0.5.0)
     paperclip (4.2.0)
       activemodel (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -291,6 +299,8 @@ GEM
       rack
       raindrops (~> 0.7)
     uniform_notifier (1.6.2)
+    warden (1.2.3)
+      rack (>= 1.0)
     websocket-driver (0.3.4)
     websocket-rails (0.7.0)
       em-synchrony
@@ -312,6 +322,7 @@ DEPENDENCIES
   binding_of_caller
   bullet
   coffee-rails (~> 4.0.0)
+  devise
   enumerize
   execjs
   foreigner
