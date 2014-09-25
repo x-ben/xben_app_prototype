@@ -2,15 +2,18 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.1.5'
 
+gem 'coffee-rails', '~> 4.0.0'
 gem 'enumerize'
 gem 'execjs'
 gem 'foreigner'
 gem 'jsonity', github: 'creasty/jsonity' # always use the latest
 gem 'mysql2'
 gem 'oj'
+gem 'jquery-rails'
 gem 'paperclip'
 gem 'therubyracer'
 gem 'unicorn'
+gem 'websocket-rails'
 
 group :development do
   gem 'annotate', '>= 2.6.0'
