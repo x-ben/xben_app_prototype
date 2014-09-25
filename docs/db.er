@@ -1,28 +1,12 @@
-[deals]
-* id         { label: "integer" }
-+ user_1_id  { label: "integer" } # null: false, index: true
-+ user_2_id  { label: "integer" } # null: false, index: true
-+ food_1_id  { label: "integer" } # null: false, index: true
-+ food_2_id  { label: "integer" } # null: false, index: true
-  status     { label: "integer" } # limit: 1, null: false, default: 0
-  created_at { label: "datetime" }
-  updated_at { label: "datetime" }
-
-deals +--1 users { label: "user_1" } # dependent: :delete
-deals +--1 users { label: "user_2" } # dependent: :delete
-deals +--1 foods { label: "food_1" } # dependent: :delete
-deals +--1 foods { label: "food_2" } # dependent: :delete
-
-
 [foods]
-* id            { label: "integer" }
-+ user_id       { label: "integer" } # null: false, index: true
-+ thumbnail_id  { label: "integer" }
-  name          { label: "string" }  # null: false
-  description   { label: "text" }
-  likes_count   { label: "integer" } # null: false, default: 0
-  created_at    { label: "datetime" }
-  updated_at    { label: "datetime" }
+* id           { label: "integer" }
++ user_id      { label: "integer" } # null: false, index: true
++ thumbnail_id { label: "integer" }
+  name         { label: "string" }  # null: false
+  description  { label: "text" }
+  likes_count  { label: "integer" } # null: false, default: 0
+  created_at   { label: "datetime" }
+  updated_at   { label: "datetime" }
 
 foods +--1 users # dependent: :delete
 foods 1--? media { label: "thumbnail" } # dependent: :nullify
@@ -40,17 +24,6 @@ food_comments +--1 users # dependent: :delete
 food_comments +--1 foods # dependent: :delete
 
 
-[lunch_boxes]
-* id         { label: "integer" }
-+ user_id    { label: "integer" } # null: false, index: true
-  konashi_id { label: "string" }  # null: false, index: true
-  color      { label: "integer" } # limit: 1
-  created_at { label: "datetime" }
-  updated_at { label: "datetime" }
-
-lunch_boxes +--1 users # dependent: :delete
-
-
 [media]
 + id                 { label: "integer" }
   asset_file_name    { label: "string" } # attachement
@@ -64,28 +37,10 @@ lunch_boxes +--1 users # dependent: :delete
 [users]
 * id         { label: "integer" }
 + avatar_id  { label: "integer" }
-  name       { label: "string" } # null: false
+  name       { label: "string" }  # null: false
+  konashi_id { label: "string" }  # null: false, index: true
+  box_color  { label: "integer" } # limit: 1
   created_at { label: "datetime" }
   updated_at { label: "datetime" }
 
 users 1--? media { label: "avatar" } # dependent: :nullify
-
-
-[user_accounts]
-* id                     { label: "integer" }
-+ user_id                { label: "integer" } # index: true, null: false
-  email                  { label: "string" }  # null: false, default: ''
-  encrypted_password     { label: "string" }  # null: false, default: ''
-  reset_password_token   { label: "string" }
-  reset_password_sent_at { label: "datetime" }
-  remember_created_at    { label: "datetime" }
-  sign_in_count          { label: "integer" } # null: false, default: 0
-  current_sign_in_at     { label: "datetime" }
-  last_sign_in_at        { label: "datetime" }
-  current_sign_in_ip     { label: "string" }
-  last_sign_in_ip        { label: "string" }
-  created_at             { label: "datetime" }
-  updated_at             { label: "datetime" }
-
-user_accounts 1--1 users # dependent: :delete
-

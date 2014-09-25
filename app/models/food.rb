@@ -20,8 +20,12 @@ class Food < ActiveRecord::Base
   belongs_to :thumbnail,
     class_name: 'Medium',
     dependent: :destroy
-  has_many :deals, dependent: :destroy
   has_many :food_comments, dependent: :destroy
+
+
+  #  Nested attributes
+  #-----------------------------------------------
+  accepts_nested_attributes_for :thumbnail
 
 
   #  Validations
