@@ -4,7 +4,22 @@
 //= require_tree ./lib
 //= require_tree .
 
-var user_id = (window.location.search.match(/user_id=(\d+)/) || [,])[1];
+
+/*=== State manager
+==============================================================================================*/
+window.StateManager = (function () {
+
+  var StateManager = function () {
+  };
+
+  var $$ = StateManager.prototype;
+
+  $$.transition = function (from, to) {
+  };
+
+  return StateManager;
+
+})();
 
 
 /*=== Application
@@ -66,7 +81,6 @@ window.App = (function () {
   return new App();
 
 })();
-
 
 
 /*=== Hist buffer
@@ -200,6 +214,7 @@ $(function () {
 
   $.get('/api/user').done(function (data) {
     console.log(data);
+    App.current_user = data.user;
     new Konashi(data.the_other_user.konashi_id);
   });
 
