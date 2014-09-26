@@ -11,7 +11,6 @@ gem 'oj'
 gem 'jquery-rails'
 gem 'paperclip'
 gem 'therubyracer'
-gem 'unicorn'
 gem 'websocket-rails'
 
 group :development do
