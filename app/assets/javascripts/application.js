@@ -21,7 +21,7 @@ window.App = (function () {
     this.dispatcher = new WebSocketRails(SOCKET_ENDPOINT);
     this.broadChannel = this.dispatcher.subscribe('broad');
 
-    this.$debug = $('<span style="font-size: 40px;" />').appendTo('body');
+    this.$debug = $('<div id="debug_console" />').appendTo('body');
 
     this._events();
   };
@@ -38,7 +38,7 @@ window.App = (function () {
   };
 
   $$.debug = function () {
-    this.$debug.text(Array.apply(null, arguments).join(', '));
+    this.$debug.html(Array.apply(null, arguments).join('<br>'));
   };
 
   return new App();
@@ -95,6 +95,7 @@ window.Konashi = (function () {
 
   var NUM_HIST = 4;
   var PIN_MODE = parseInt('11111110', 2);
+  var TICK_INTERVAL = 350;
 
   var Konashi = function (id) {
     this.id = id;
@@ -128,16 +129,12 @@ window.Konashi = (function () {
 
   $$.ready = function () {
     this.k.pinModeAll(PIN_MODE);
-    // this.k.pinMode(this.k.PIO0, this.k.INPUT);
-    // this.k.pinMode(this.k.PIO2, this.k.OUTPUT);
 
-    this.timer = setInterval(this._tick.bind(this), 500);
+    this.timer = setInterval(this._tick.bind(this), TICK_INTERVAL);
   };
 
   $$._tick = function () {
-    this.k.digitalWrite(this.k.PIO2, this.k.HIGHT);
     this.k.signalStrengthReadRequest();
-    // this.k.analogReadRequest(this.k.AIO0);
   };
 
   $$.updatePioInput = function (data) {
@@ -156,7 +153,14 @@ window.Konashi = (function () {
 
     if (isNear != this.isNear) {
       this.isNear = isNear;
-      App.log(this.isNear ? 'near' : 'far');
+
+      if (this.isNear) {
+        App.log('near');
+        this.k.digitalWrite(this.k.PIO1, this.k.HIGH);
+      } else {
+        App.log('far');
+        this.k.digitalWrite(this.k.PIO1, this.k.LOW);
+      }
     }
   };
 
