@@ -563,4 +563,3 @@
   var kBefore = window.k;
   window.k = konashi;
 })();
-
