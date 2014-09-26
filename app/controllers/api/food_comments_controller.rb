@@ -2,6 +2,9 @@ class Api::FoodCommentsController < Api::ApplicationController
 
   def index
     @comments = FoodComment
+      .includes(
+        { user: [:avatar] },
+      )
       .where(food_id: params[:food_id])
       .order(created_at: :desc)
 
