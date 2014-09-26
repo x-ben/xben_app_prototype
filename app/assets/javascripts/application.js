@@ -1,8 +1,12 @@
 //= require jquery
 //= require jquery_ujs
 //= require websocket_rails/main
+//= require angular
 //= require_tree ./lib
 //= require_tree .
+
+
+window.Ang = angular.module('xben', []);
 
 
 /*=== State manager
