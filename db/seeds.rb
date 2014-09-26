@@ -9,7 +9,7 @@ ActiveRecord::Base.transaction do
   def create_user(name, id)
     user = User.new(
       name:       name,
-      konashi_id: '#4-1591',  # FIXME
+      konashi_id: 'konashi#4-1591',  # FIXME
       color:      0xff,
     )
 

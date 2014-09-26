@@ -4,6 +4,8 @@
 //= require_tree ./lib
 //= require_tree .
 
+var user_id = (window.location.search.match(/user_id=(\d+)/) || [,])[1];
+
 
 /*=== Application
 ==============================================================================================*/
@@ -19,7 +21,7 @@ window.App = (function () {
 
   $$.run = function () {
     this.dispatcher = new WebSocketRails(SOCKET_ENDPOINT);
-    this.broadChannel = this.dispatcher.subscribe('broad');
+    this.channel = this.dispatcher.subscribe('main');
 
     this.$debug = $('<div id="debug_console" />').appendTo('body');
 
@@ -28,13 +30,33 @@ window.App = (function () {
 
   $$._events = function () {
     // Register remote logger
-    this.broadChannel.bind('console.log', function (data) {
-      console.log.call(console, data);
+    this.channel.bind('console.log', function (data) {
+      console.log.call('console.log', console, data);
+    });
+
+    this.channel.bind('deal.request', function (data) {
+      console.log('deal.request', data);
+    });
+
+    this.channel.bind('deal.accept', function (data) {
+      console.log('deal.accept', data);
+    });
+
+    this.channel.bind('user.update_color', function (data) {
+      console.log('user.update_color', data);
+    });
+
+    this.channel.bind('food.update_likes_count', function (data) {
+      console.log('food.update_likes_count', data);
+    });
+
+    this.channel.bind('food_comment.create', function (data) {
+      console.log('food_comment.create', data);
     });
   };
 
   $$.log = function () {
-    this.broadChannel.trigger('console.log', arguments);
+    this.channel.trigger('console.log', arguments);
   };
 
   $$.debug = function () {
@@ -120,6 +142,7 @@ window.Konashi = (function () {
   };
 
   $$.connected = function () {
+    App.debug('Connected!');
     App.log('connected!');
   };
 
@@ -174,6 +197,28 @@ window.Konashi = (function () {
 $(function () {
 
   App.run();
-  new Konashi('konashi#4-1591');
+
+  $.get('/api/user').done(function (data) {
+    console.log(data);
+    new Konashi(data.the_other_user.konashi_id);
+  });
+
+  $.get('/api/foods').done(function (data) {
+    console.log(data);
+  });
+
+  $.get('/api/foods/1/food_comments').done(function (data) {
+    console.log(data);
+  });
+
+  setTimeout(function () {
+    $.post('/api/foods/1/like');
+
+    $.post('/api/foods/1/food_comments', {
+      food_comment: { body: '美味しかったですー' }
+    }).done(function (data) {
+      console.log(data);
+    });
+  }, 2000);
 
 });

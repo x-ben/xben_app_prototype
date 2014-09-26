@@ -14,6 +14,7 @@
 class Medium < ActiveRecord::Base
 
   attr_json :id
+  attr_json :errors
 
   attr_json { |medium|
     medium.medium_url    { |m| m.url :medium }

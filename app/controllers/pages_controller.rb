@@ -1,9 +1,7 @@
 class PagesController < ApplicationController
 
-  def index; end
-
-  def aaa
-    WebsocketRails[:cb].trigger 'ks.test', { a: 1324 }
+  def index
+    session[:user_id] = params[:user_id]
   end
 
 end

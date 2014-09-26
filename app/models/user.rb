@@ -13,6 +13,11 @@
 
 class User < ActiveRecord::Base
 
+  attr_json :id, :avatar_id
+  attr_json :name, :konashi_id, :color
+  attr_json :errors
+
+
   #  Associations
   #-----------------------------------------------
   belongs_to :avatar,
@@ -35,7 +40,7 @@ class User < ActiveRecord::Base
     length: { maximum: 150 }
   validates :konashi_id,
     presence: true,
-    length: { maximum: 150 }
+    format: { with: /\Akonashi#\d-\d{4}\z/ }
   validates :color,
     presence: true,
     numericality: {
@@ -43,5 +48,17 @@ class User < ActiveRecord::Base
       greater_than_or_equal_to: 0x00,
       less_than_or_equal_to:    0xff,
     }
+
+
+  #  Callbacks
+  #-----------------------------------------------
+  after_update do |user|
+    if user.color_changed?
+      WebsocketRails[:main].trigger 'user.update_color', {
+        id: user.id,
+        color: user.color,
+      }
+    end
+  end
 
 end
