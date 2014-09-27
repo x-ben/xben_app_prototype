@@ -12,18 +12,6 @@ foods +--1 users # dependent: :delete
 foods 1--? media { label: "thumbnail" } # dependent: :nullify
 
 
-[food_comments]
-* id         { label: "integer" }
-+ food_id    { label: "integer" } # null: false, index: true
-+ user_id    { label: "integer" } # null: false, index: true
-  body       { label: "text" }
-  created_at { label: "datetime" }
-  updated_at { label: "datetime" }
-
-food_comments +--1 users # dependent: :delete
-food_comments +--1 foods # dependent: :delete
-
-
 [media]
 + id                 { label: "integer" }
   asset_file_name    { label: "string" } # attachement

@@ -56,21 +56,5 @@
       </li>
     </ul>
 
-    <div ng-if="dealConcluded">
-
-      <ul>
-        <li ng-repeat="comment in comments">
-          <p>{{ comment.body }}</p>
-          <p>by {{ comment.user.name }}</p>
-
-          <hr>
-        </li>
-      </ul>
-
-      <textarea cols="30" rows="10" ng-model="newComment.body"></textarea>
-      <button ng-click="createComment()">Submit</button>
-
-    </div>
-
   </div>
 </div>

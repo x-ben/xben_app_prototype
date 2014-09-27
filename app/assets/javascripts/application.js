@@ -28,10 +28,6 @@ window.App = (function () {
     this.channel.bind('console.log', function (data) {
       console.log('console.log', data);
     });
-
-    this.channel.bind('user.update_color', function (data) {
-      console.log('user.update_color', data);
-    });
   };
 
   var toArray = function (a) {
@@ -277,44 +273,12 @@ Ang.controller('MainController', function ($scope, $http) {
     $scope.$apply(function () {
       $scope.deals = foods;
       $scope.dealConcluded = true;
-      $scope.initCommentsView();
     });
   });
-
-  $scope.initCommentsView = function () {
-    $scope.comments = [];
-    $scope.newComment = {};
-
-    $http.get('/api/foods/' + $scope.selected.id + '/food_comments').success(function (data) {
-      console.log(data);
-      $scope.comments = data.food_comments;
-    });
-  };
 
   $scope.like = function (id) {
     $http.post('/api/foods/' + id + '/like');
   };
-
-  $scope.createComment = function () {
-    $.post('/api/foods/' + $scope.selected.id + '/food_comments', {
-      food_comment: $scope.newComment
-    }).done(function (data) {
-      $scope.$apply(function () {
-        $scope.newComment.body = '';
-      });
-    });
-  };
-
-  App.channel.bind('food_comment.create', function (comment) {
-    $scope.$apply(function () {
-      if (
-        $scope.selected.user_id != comment.user_id
-        && $scope.current_user.id != comment.user_id
-      ) return;
-
-      $scope.comments.push(comment);
-    });
-  });
 
   App.channel.bind('food.update_likes_count', function (food) {
     $scope.$apply(function () {
