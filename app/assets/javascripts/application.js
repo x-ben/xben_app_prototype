@@ -46,11 +46,11 @@ window.App = (function () {
     var args = toArray(arguments);
     var event = args.shift();
     this.$window.trigger(event, args);
-  }
+  };
 
   $$.on = function (event, callback) {
     this.$window.on(event, callback);
-  }
+  };
 
   return new App();
 
@@ -144,7 +144,7 @@ window.SMA = (function () {
       this.reset(data);
       this._hasData = true;
     }
-  }
+  };
 
   return SMA;
 
