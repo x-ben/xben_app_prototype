@@ -5,25 +5,7 @@
 //= require_tree ./lib
 //= require_tree .
 
-
 window.Ang = angular.module('xben', []);
-
-
-/*=== State manager
-==============================================================================================*/
-window.StateManager = (function () {
-
-  var StateManager = function () {
-  };
-
-  var $$ = StateManager.prototype;
-
-  $$.transition = function (from, to) {
-  };
-
-  return StateManager;
-
-})();
 
 
 /*=== Application
@@ -33,72 +15,112 @@ window.App = (function () {
   var SOCKET_ENDPOINT = window.location.host + '/websocket';
 
   var App = function () {
-    // do nothing (defer initialization)
-  };
-
-  var $$ = App.prototype;
-
-  $$.run = function () {
     this.dispatcher = new WebSocketRails(SOCKET_ENDPOINT);
     this.channel = this.dispatcher.subscribe('main');
-
-    this.$debug = $('<div id="debug_console" />').appendTo('body');
+    this.$window = $(window);
 
     this._events();
   };
 
+  var $$ = App.prototype;
+
   $$._events = function () {
-    // Register remote logger
     this.channel.bind('console.log', function (data) {
-      console.log.call('console.log', console, data);
-    });
-
-    this.channel.bind('deal.request', function (data) {
-      console.log('deal.request', data);
-    });
-
-    this.channel.bind('deal.accept', function (data) {
-      console.log('deal.accept', data);
+      console.log('console.log', data);
     });
 
     this.channel.bind('user.update_color', function (data) {
       console.log('user.update_color', data);
     });
+  };
 
-    this.channel.bind('food.update_likes_count', function (data) {
-      console.log('food.update_likes_count', data);
-    });
-
-    this.channel.bind('food_comment.create', function (data) {
-      console.log('food_comment.create', data);
-    });
+  var toArray = function (a) {
+    return Array.prototype.slice.call(a);
   };
 
   $$.log = function () {
-    this.channel.trigger('console.log', arguments);
+    this.channel.trigger('console.log', toArray(arguments));
   };
 
-  $$.debug = function () {
-    this.$debug.html(Array.apply(null, arguments).join('<br>'));
-  };
+  $$.trigger = function () {
+    var args = toArray(arguments);
+    var event = args.shift();
+    this.$window.trigger(event, args);
+  }
+
+  $$.on = function (event, callback) {
+    this.$window.on(event, callback);
+  }
 
   return new App();
 
 })();
 
 
-/*=== Hist buffer
+/*=== Deal
 ==============================================================================================*/
-window.HistBuffer = (function () {
+window.Deal = (function () {
 
-  var HistBuffer = function (num) {
+  var Deal = function () {
+    this.reset();
+    this._events();
+  };
+
+  var $$ = Deal.prototype;
+
+  $$.reset = function (food) {
+    this.others = null;
+    this.mine = null;
+    this.isConcluded = false;
+  };
+
+  $$._events = function () {
+    App.channel.bind('deal.request', function (food) {
+      if (food.user_id != App.current_user.id) return;
+
+      this.mine = food;
+
+      if (this.others) {
+        this.conclude();
+      } else {
+        App.trigger('deal.request', food);
+      }
+    }.bind(this));
+
+    App.channel.bind('deal.conclude', function (foods) {
+      if (this.isConcluded) return;
+      this.isConcluded = true;
+
+      App.trigger('deal.conclude', foods);
+    }.bind(this));
+  };
+
+  $$.request = function (food) {
+    this.others = food;
+    App.channel.trigger('deal.request', food);
+  };
+
+  $$.conclude = function (food) {
+    App.channel.trigger('deal.conclude', [this.others, this.mine]);
+  };
+
+  return new Deal();
+
+})();
+
+
+/*=== Simple moving average
+==============================================================================================*/
+window.SMA = (function () {
+
+  var SMA = function (num) {
     this._hasData = false;
 
     this.num = num;
     this.buffer = Array.apply(null, Array(this.num));
   };
 
-  var $$ = HistBuffer.prototype;
+  var $$ = SMA.prototype;
 
   $$.reset = function(data) {
     if (data == null) {
@@ -124,7 +146,7 @@ window.HistBuffer = (function () {
     }
   }
 
-  return HistBuffer;
+  return SMA;
 
 })();
 
@@ -141,7 +163,8 @@ window.Konashi = (function () {
     this.id = id;
     this.k = window.k;
     this.timer = null;
-    this.signalHist = new HistBuffer(NUM_HIST);
+
+    this.signalSMA = new SMA(NUM_HIST);
     this.isNear = false;
 
     this._events();
@@ -160,8 +183,7 @@ window.Konashi = (function () {
   };
 
   $$.connected = function () {
-    App.debug('Connected!');
-    App.log('connected!');
+    App.log('connected to konashi');
   };
 
   $$.disconnected = function () {
@@ -179,18 +201,27 @@ window.Konashi = (function () {
   };
 
   $$.updatePioInput = function (data) {
-    App.log(data);
+    App.log('pio input: ', data);
+
+    switch (data) {
+      case 3:
+        // contacting
+        break;
+      case 2:
+        // not contacting
+        break;
+    }
   };
 
-  $$.updateSignalStrength = function (data) {
-    data *= -1;
+  $$.updateSignalStrength = function (strength) {
+    strength *= -1;
 
-    this.signalHist.add(data);
+    this.signalSMA.add(strength);
 
-    var avg = this.signalHist.getAverage() | 0;
+    var avg = this.signalSMA.getAverage() | 0;
     var isNear = avg < 70;
 
-    App.debug(data, avg);
+    // App.log({ raw: strength, avg: avg });
 
     if (isNear != this.isNear) {
       this.isNear = isNear;
@@ -212,32 +243,87 @@ window.Konashi = (function () {
 
 /*=== Main
 ==============================================================================================*/
-$(function () {
+Ang.controller('MainController', function ($scope, $http) {
 
-  App.run();
-
-  $.get('/api/user').done(function (data) {
-    console.log(data);
+  $http.get('/api/user').success(function (data) {
     App.current_user = data.user;
+    $scope.current_user = App.current_user;
+
     new Konashi(data.the_other_user.konashi_id);
   });
 
-  $.get('/api/foods').done(function (data) {
-    console.log(data);
+  $http.get('/api/foods').success(function (data) {
+    $scope.foods = data.foods;
   });
 
-  $.get('/api/foods/1/food_comments').done(function (data) {
-    console.log(data);
+  $scope.select = function (food) {
+    $scope.selected = food;
+    $scope.deals = [food, null];
+
+    Deal.request(food);
+  };
+
+  $scope.disselect = function () {
+    $scope.selected = null;
+  };
+
+  App.on('deal.request', function (e, food) {
+    alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
   });
 
-  setTimeout(function () {
-    $.post('/api/foods/1/like');
+  App.on('deal.conclude', function (e, foods) {
+    console.log(foods);
 
-    $.post('/api/foods/1/food_comments', {
-      food_comment: { body: '美味しかったですー' }
-    }).done(function (data) {
-      console.log(data);
+    $scope.$apply(function () {
+      $scope.deals = foods;
+      $scope.dealConcluded = true;
+      $scope.initCommentsView();
     });
-  }, 2000);
+  });
+
+  $scope.initCommentsView = function () {
+    $scope.comments = [];
+    $scope.newComment = {};
+
+    $http.get('/api/foods/' + $scope.selected.id + '/food_comments').success(function (data) {
+      console.log(data);
+      $scope.comments = data.food_comments;
+    });
+  };
+
+  $scope.like = function (id) {
+    $http.post('/api/foods/' + id + '/like');
+  };
+
+  $scope.createComment = function () {
+    $.post('/api/foods/' + $scope.selected.id + '/food_comments', {
+      food_comment: $scope.newComment
+    }).done(function (data) {
+      $scope.$apply(function () {
+        $scope.newComment.body = '';
+      });
+    });
+  };
+
+  App.channel.bind('food_comment.create', function (comment) {
+    $scope.$apply(function () {
+      if (
+        $scope.selected.user_id != comment.user_id
+        && $scope.current_user.id != comment.user_id
+      ) return;
+
+      $scope.comments.push(comment);
+    });
+  });
+
+  App.channel.bind('food.update_likes_count', function (food) {
+    $scope.$apply(function () {
+      $scope.deals.forEach(function (f) {
+        if (f.id == food.id) {
+          f.likes_count = food.likes_count;
+        }
+      });
+    });
+  });
 
 });

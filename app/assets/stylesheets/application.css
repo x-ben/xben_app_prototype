@@ -3,20 +3,17 @@
  *= require_self
  */
 
-html, body {
+html {
+  background: #ddd;
+  text-align: center;
+}
+
+body {
   width: 320px;
   padding: 0;
-}
-
-#debug_console {
-  font-size: 30px;
-  background: #eee;
-  padding: 10px;
-  margin: 30px 0;
-  width: 100%;
-}
-
-.hide {
-  display: none;
+  margin: 0 auto;
+  text-align: left;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
 }
 

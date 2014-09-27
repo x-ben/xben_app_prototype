@@ -29,9 +29,8 @@ class Medium < ActiveRecord::Base
   #-----------------------------------------------
   has_attached_file :asset,
     styles: {
-      medium:    '640x640#',
-      thumbnail: '240x170#',
-      small:     '300>',
+      medium:    '320x198#',
+      thumbnail: '200x200#',
     },
     convert_options: {
       large: '-strip',
