@@ -16,7 +16,7 @@ window.App = (function () {
 
   var App = function () {
     this.current_user_id = +(window.location.search.match(/\buser_id=(\d+)/) || [])[1];
-    this.other_user_id = 2 - this.current_user_id;
+    this.other_user_id = 3 - this.current_user_id;
 
     this.dispatcher = new WebSocketRails(SOCKET_ENDPOINT);
     this.channel = this.dispatcher.subscribe('main');
@@ -31,6 +31,10 @@ window.App = (function () {
     this.channel.bind('console.log', function (data) {
       console.log('console.log', data);
     });
+
+    this.channel.bind('user:' + this.current_user_id, function (data) {
+      this.$window.trigger(data.event, data.args);
+    }.bind(this));
   };
 
   var toArray = function (a) {
@@ -49,6 +53,12 @@ window.App = (function () {
 
   $$.on = function (event, callback) {
     this.$window.on(event, callback);
+  };
+
+  $$.triggerToOther = function () {
+    var args = toArray(arguments);
+    var event = args.shift();
+    this.channel.trigger('user:' + this.other_user_id, { event: event, args: args });
   };
 
   return new App();
@@ -220,10 +230,10 @@ window.Konashi = (function () {
 
     switch (data) {
       case 3:
-        // inserted
+        this.inserted();
         break;
       case 2:
-        // ejected
+        this.ejected();
         break;
     }
   };
@@ -250,6 +260,14 @@ window.Konashi = (function () {
         // this.k.digitalWrite(this.k.PIO1, this.k.LOW);
       }
     }
+  };
+
+  $$.inserted = function () {
+    App.triggerToOther('piece.inserted');
+  };
+
+  $$.ejected = function () {
+    App.triggerToOther('piece.ejected');
   };
 
   return Konashi;
@@ -331,10 +349,16 @@ Ang.controller('MainController', function ($scope, $http) {
     foods = foods.map(function (food) {
       return Food.save(food);
     });
+
     console.log(foods);
 
     $scope.$apply(function () {
-      $scope.deals = foods;
+      if (foods[0] == $scope.selected) {
+        $scope.deals[1] = foods[1];
+      } else {
+        $scope.deals[1] = foods[0];
+      }
+
       $scope.dealAccepted = true;
     });
   });
@@ -347,6 +371,14 @@ Ang.controller('MainController', function ($scope, $http) {
     $scope.$apply(function () {
       console.log(Food.save(food));
     });
+  });
+
+  App.on('piece.inserted', function () {
+    // TODO
+  });
+
+  App.on('piece.ejected', function () {
+    // TODO
   });
 
 });
