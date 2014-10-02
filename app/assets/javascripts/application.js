@@ -252,12 +252,10 @@ window.Konashi = (function () {
       this.isNear = isNear;
 
       if (this.isNear) {
-        App.log('near');
         this.k.uartWrite(ARD_SIG_APPROACH);
-        // this.k.digitalWrite(this.k.PIO1, this.k.HIGH);
+        App.trigger('other_user.near');
       } else {
-        App.log('far');
-        // this.k.digitalWrite(this.k.PIO1, this.k.LOW);
+        App.trigger('other_user.far');
       }
     }
   };
@@ -374,11 +372,19 @@ Ang.controller('MainController', function ($scope, $http) {
   });
 
   App.on('piece.inserted', function () {
-    // TODO
+    App.log('inserted');
   });
 
   App.on('piece.ejected', function () {
-    // TODO
+    App.log('ejected');
   });
+
+  App.on('other_user.near', function () {
+    App.log('near');
+  })
+
+  App.on('other_user.far', function () {
+    App.log('far');
+  })
 
 });
