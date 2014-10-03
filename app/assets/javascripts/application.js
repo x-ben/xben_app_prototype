@@ -373,18 +373,26 @@ Ang.controller('MainController', function ($scope, $http) {
 
   App.on('piece.inserted', function () {
     App.log('inserted');
+
+    $scope.$apply(function () {
+      $scope.piece = 'inserted';
+    });
   });
 
   App.on('piece.ejected', function () {
     App.log('ejected');
+
+    $scope.$apply(function () {
+      $scope.piece = 'ejected';
+    });
   });
 
   App.on('other_user.near', function () {
     App.log('near');
-  })
+  });
 
   App.on('other_user.far', function () {
     App.log('far');
-  })
+  });
 
 });
