@@ -24,7 +24,8 @@ ActiveRecord::Base.transaction do
   end
 
   $user_hamatani = create_user '浜谷光吉', 1
-  $user_nagano = create_user 'Nagano Hikaru', 2
+  $user_nagano = create_user '長野光', 2
+  $user_nakazawa = create_user '中澤優子', 3
 
   puts
 end
@@ -61,6 +62,22 @@ ActiveRecord::Base.transaction do
     )
 
     thumbnail_image = File.open(IMAGES_PATH.join('food', 'tyahsyu.jpg'), 'rb')
+    food.build_thumbnail asset: thumbnail_image
+
+    food.save!
+    $foods << food
+
+    print '#'
+  end
+
+  (1..3).each do |i|
+    food = Food.new(
+      user_id:     $user_nakazawa.id,
+      name:        'パンケーキ %d' % i,
+      description: 'プレゴのパンケーキです',
+    )
+
+    thumbnail_image = File.open(IMAGES_PATH.join('food', 'pancake.jpg'), 'rb')
     food.build_thumbnail asset: thumbnail_image
 
     food.save!
