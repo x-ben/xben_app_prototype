@@ -338,9 +338,10 @@ Ang.controller('MainController', function ($scope, $http) {
     $scope.state = 'selected';
   };
 
-  $scope.disselect = function () {
+  $scope.back = function () {
     $scope.selected = null;
     $scope.state = 'initial';
+    Deal.reset();
   };
 
   $scope.isState = function (state) {
