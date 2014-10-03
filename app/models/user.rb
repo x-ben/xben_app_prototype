@@ -6,7 +6,6 @@
 #  avatar_id  :integer          indexed
 #  name       :string(255)      not null
 #  konashi_id :string(255)      not null, indexed
-#  color      :integer          not null
 #  created_at :datetime
 #  updated_at :datetime
 #
@@ -14,7 +13,7 @@
 class User < ActiveRecord::Base
 
   attr_json :id, :avatar_id
-  attr_json :name, :konashi_id, :color
+  attr_json :name, :konashi_id
   attr_json :errors
 
 
@@ -41,12 +40,5 @@ class User < ActiveRecord::Base
   validates :konashi_id,
     presence: true,
     format: { with: /\Akonashi#\d-\d{4}\z/ }
-  validates :color,
-    presence: true,
-    numericality: {
-      only_integer:             true,
-      greater_than_or_equal_to: 0x00,
-      less_than_or_equal_to:    0xff,
-    }
 
 end
