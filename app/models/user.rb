@@ -49,16 +49,4 @@ class User < ActiveRecord::Base
       less_than_or_equal_to:    0xff,
     }
 
-
-  #  Callbacks
-  #-----------------------------------------------
-  after_update do |user|
-    if user.color_changed?
-      WebsocketRails[:main].trigger 'user.update_color', {
-        id: user.id,
-        color: user.color,
-      }
-    end
-  end
-
 end

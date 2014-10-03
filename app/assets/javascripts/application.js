@@ -312,6 +312,8 @@ window.Food = Model();
 ==============================================================================================*/
 Ang.controller('MainController', function ($scope, $http) {
 
+  $scope.state = 'initial';
+
   $http.get('/api/user').success(function (data) {
     App.current_user = User.save(data.user);
     $scope.current_user = App.current_user;
@@ -333,14 +335,20 @@ Ang.controller('MainController', function ($scope, $http) {
     $scope.deals = [food, null];
 
     Deal.request(food);
+    $scope.state = 'selected';
   };
 
   $scope.disselect = function () {
     $scope.selected = null;
+    $scope.state = 'initial';
   };
 
   App.on('deal.request', function (e, food) {
     alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
+
+    $scope.$apply(function () {
+      $scope.state = 'request';
+    });
   });
 
   App.on('deal.accept', function (e, foods) {
@@ -351,6 +359,7 @@ Ang.controller('MainController', function ($scope, $http) {
     console.log(foods);
 
     $scope.$apply(function () {
+
       if (foods[0] == $scope.selected) {
         $scope.deals[1] = foods[1];
       } else {
@@ -358,6 +367,7 @@ Ang.controller('MainController', function ($scope, $http) {
       }
 
       $scope.dealAccepted = true;
+      $scope.state = 'accept';
     });
   });
 
@@ -366,6 +376,7 @@ Ang.controller('MainController', function ($scope, $http) {
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
+
     $scope.$apply(function () {
       console.log(Food.save(food));
     });
@@ -373,6 +384,37 @@ Ang.controller('MainController', function ($scope, $http) {
 
   App.on('piece.inserted', function () {
     App.log('inserted');
+
+    $scope.$apply(function () {
+      $scope.state = 'inserted';
+    });
+  });
+
+  App.on('piece.ejected', function () {
+    App.log('ejected');
+
+    $scope.$apply(function () {
+      $scope.state = 'ejected';
+    });
+  });
+
+  App.on('other_user.near', function () {
+    App.log('near');
+
+    $scope.$apply(function () {
+      var user = User.find(App.other_user_id);
+      user.isNear = true;
+    });
+  });
+
+  App.on('other_user.far', function () {
+    App.log('far');
+
+    $scope.$apply(function () {
+      var user = User.find(App.other_user_id);
+      user.isNear = false;
+    });
+
   });
 
   App.on('piece.ejected', function () {
