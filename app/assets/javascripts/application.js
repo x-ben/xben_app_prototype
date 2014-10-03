@@ -5,7 +5,7 @@
 //= require_tree ./lib
 //= require_tree .
 
-window.Ang = angular.module('xben', []);
+window.Ang = angular.module('xben', ['angular-carousel']);
 
 
 /*=== Application
@@ -15,6 +15,9 @@ window.App = (function () {
   var SOCKET_ENDPOINT = window.location.host + '/websocket';
 
   var App = function () {
+    this.current_user_id = +(window.location.search.match(/\buser_id=(\d+)/) || [])[1];
+    this.other_user_id = 3 - this.current_user_id;
+
     this.dispatcher = new WebSocketRails(SOCKET_ENDPOINT);
     this.channel = this.dispatcher.subscribe('main');
     this.$window = $(window);
@@ -29,9 +32,9 @@ window.App = (function () {
       console.log('console.log', data);
     });
 
-    this.channel.bind('user.update_color', function (data) {
-      console.log('user.update_color', data);
-    });
+    this.channel.bind('user:' + this.current_user_id, function (data) {
+      this.$window.trigger(data.event, data.args);
+    }.bind(this));
   };
 
   var toArray = function (a) {
@@ -46,11 +49,17 @@ window.App = (function () {
     var args = toArray(arguments);
     var event = args.shift();
     this.$window.trigger(event, args);
-  }
+  };
 
   $$.on = function (event, callback) {
     this.$window.on(event, callback);
-  }
+  };
+
+  $$.triggerToOther = function () {
+    var args = toArray(arguments);
+    var event = args.shift();
+    this.channel.trigger('user:' + this.other_user_id, { event: event, args: args });
+  };
 
   return new App();
 
@@ -71,7 +80,7 @@ window.Deal = (function () {
   $$.reset = function (food) {
     this.others = null;
     this.mine = null;
-    this.isConcluded = false;
+    this.isAccepted = false;
   };
 
   $$._events = function () {
@@ -81,17 +90,17 @@ window.Deal = (function () {
       this.mine = food;
 
       if (this.others) {
-        this.conclude();
+        this.accept();
       } else {
         App.trigger('deal.request', food);
       }
     }.bind(this));
 
-    App.channel.bind('deal.conclude', function (foods) {
-      if (this.isConcluded) return;
-      this.isConcluded = true;
+    App.channel.bind('deal.accept', function (foods) {
+      if (this.isAccepted) return;
+      this.isAccepted = true;
 
-      App.trigger('deal.conclude', foods);
+      App.trigger('deal.accept', foods);
     }.bind(this));
   };
 
@@ -100,8 +109,8 @@ window.Deal = (function () {
     App.channel.trigger('deal.request', food);
   };
 
-  $$.conclude = function (food) {
-    App.channel.trigger('deal.conclude', [this.others, this.mine]);
+  $$.accept = function (food) {
+    App.channel.trigger('deal.accept', [this.others, this.mine]);
   };
 
   return new Deal();
@@ -144,7 +153,7 @@ window.SMA = (function () {
       this.reset(data);
       this._hasData = true;
     }
-  }
+  };
 
   return SMA;
 
@@ -158,6 +167,12 @@ window.Konashi = (function () {
   var NUM_HIST = 4;
   var PIN_MODE = parseInt('11111110', 2);
   var TICK_INTERVAL = 350;
+
+  var ARD_SIG_DEAL_REQUEST = 1;  // はなれた場所で欲しい「おかず」リクエスト
+  var ARD_SIG_DEAL_ACCEPT  = 2;  // はなれた場所で交換承認
+  var ARD_SIG_APPROACH     = 3;  // 出逢う
+  var ARD_SIG_LIKE         = 4;  // うまいね！ボタンを押す
+
 
   var Konashi = function (id) {
     this.id = id;
@@ -180,6 +195,14 @@ window.Konashi = (function () {
     this.k.ready(this.ready.bind(this));
     this.k.updateSignalStrength(this.updateSignalStrength.bind(this));
     this.k.updatePioInput(this.updatePioInput.bind(this));
+
+    App.on('deal.request', function (e, food) {
+      this.k.uartWrite(ARD_SIG_DEAL_REQUEST);
+    }.bind(this));
+
+    App.on('deal.accept', function (e, foods) {
+      this.k.uartWrite(ARD_SIG_DEAL_ACCEPT);
+    }.bind(this));
   };
 
   $$.connected = function () {
@@ -192,6 +215,8 @@ window.Konashi = (function () {
 
   $$.ready = function () {
     this.k.pinModeAll(PIN_MODE);
+    this.k.uartBaudrate(this.k.KONASHI_UART_RATE_9K6);
+    this.k.uartMode(this.k.KONASHI_UART_ENABLE);
 
     this.timer = setInterval(this._tick.bind(this), TICK_INTERVAL);
   };
@@ -205,10 +230,10 @@ window.Konashi = (function () {
 
     switch (data) {
       case 3:
-        // contacting
+        this.inserted();
         break;
       case 2:
-        // not contacting
+        this.ejected();
         break;
     }
   };
@@ -227,13 +252,20 @@ window.Konashi = (function () {
       this.isNear = isNear;
 
       if (this.isNear) {
-        App.log('near');
-        this.k.digitalWrite(this.k.PIO1, this.k.HIGH);
+        this.k.uartWrite(ARD_SIG_APPROACH);
+        App.trigger('other_user.near');
       } else {
-        App.log('far');
-        this.k.digitalWrite(this.k.PIO1, this.k.LOW);
+        App.trigger('other_user.far');
       }
     }
+  };
+
+  $$.inserted = function () {
+    App.triggerToOther('piece.inserted');
+  };
+
+  $$.ejected = function () {
+    App.triggerToOther('piece.ejected');
   };
 
   return Konashi;
@@ -241,22 +273,62 @@ window.Konashi = (function () {
 })();
 
 
+/*=== Models
+==============================================================================================*/
+var Model = function () {
+
+  var _cache = {};
+
+  var Model = function () {};
+
+  Model.save = function (attrs) {
+    var obj = _cache[attrs.id] || new this();
+    _cache[attrs.id] = obj;
+
+    for (var key in attrs) {
+      obj[key] = attrs[key];
+    }
+
+    return obj;
+  };
+
+  Model.find = function (id) {
+    return _cache[id];
+  };
+
+  Model.all = function (id) {
+    return _cache;
+  };
+
+  return Model;
+
+};
+
+window.User = Model();
+window.Food = Model();
+
+
 /*=== Main
 ==============================================================================================*/
 Ang.controller('MainController', function ($scope, $http) {
 
   $http.get('/api/user').success(function (data) {
-    App.current_user = data.user;
+    App.current_user = User.save(data.user);
     $scope.current_user = App.current_user;
 
-    new Konashi(data.the_other_user.konashi_id);
+    var otherUser = User.save(data.the_other_user);
+    new Konashi(otherUser.konashi_id);
   });
 
   $http.get('/api/foods').success(function (data) {
-    $scope.foods = data.foods;
+    $scope.foods = data.foods.map(function (food) {
+      return Food.save(food);
+    });
   });
 
   $scope.select = function (food) {
+    food = Food.save(food);
+
     $scope.selected = food;
     $scope.deals = [food, null];
 
@@ -271,59 +343,48 @@ Ang.controller('MainController', function ($scope, $http) {
     alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
   });
 
-  App.on('deal.conclude', function (e, foods) {
+  App.on('deal.accept', function (e, foods) {
+    foods = foods.map(function (food) {
+      return Food.save(food);
+    });
+
     console.log(foods);
 
     $scope.$apply(function () {
-      $scope.deals = foods;
-      $scope.dealConcluded = true;
-      $scope.initCommentsView();
+      if (foods[0] == $scope.selected) {
+        $scope.deals[1] = foods[1];
+      } else {
+        $scope.deals[1] = foods[0];
+      }
+
+      $scope.dealAccepted = true;
     });
   });
-
-  $scope.initCommentsView = function () {
-    $scope.comments = [];
-    $scope.newComment = {};
-
-    $http.get('/api/foods/' + $scope.selected.id + '/food_comments').success(function (data) {
-      console.log(data);
-      $scope.comments = data.food_comments;
-    });
-  };
 
   $scope.like = function (id) {
     $http.post('/api/foods/' + id + '/like');
   };
 
-  $scope.createComment = function () {
-    $.post('/api/foods/' + $scope.selected.id + '/food_comments', {
-      food_comment: $scope.newComment
-    }).done(function (data) {
-      $scope.$apply(function () {
-        $scope.newComment.body = '';
-      });
-    });
-  };
-
-  App.channel.bind('food_comment.create', function (comment) {
-    $scope.$apply(function () {
-      if (
-        $scope.selected.user_id != comment.user_id
-        && $scope.current_user.id != comment.user_id
-      ) return;
-
-      $scope.comments.push(comment);
-    });
-  });
-
   App.channel.bind('food.update_likes_count', function (food) {
     $scope.$apply(function () {
-      $scope.deals.forEach(function (f) {
-        if (f.id == food.id) {
-          f.likes_count = food.likes_count;
-        }
-      });
+      console.log(Food.save(food));
     });
   });
+
+  App.on('piece.inserted', function () {
+    App.log('inserted');
+  });
+
+  App.on('piece.ejected', function () {
+    App.log('ejected');
+  });
+
+  App.on('other_user.near', function () {
+    App.log('near');
+  })
+
+  App.on('other_user.far', function () {
+    App.log('far');
+  })
 
 });
