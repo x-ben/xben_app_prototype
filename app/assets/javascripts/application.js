@@ -5,7 +5,7 @@
 //= require_tree ./lib
 //= require_tree .
 
-window.Ang = angular.module('xben', []);
+window.Ang = angular.module('xben', ['angular-carousel']);
 
 
 /*=== Application
@@ -359,6 +359,7 @@ Ang.controller('MainController', function ($scope, $http) {
     console.log(foods);
 
     $scope.$apply(function () {
+
       if (foods[0] == $scope.selected) {
         $scope.deals[1] = foods[1];
       } else {
@@ -375,6 +376,7 @@ Ang.controller('MainController', function ($scope, $http) {
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
+
     $scope.$apply(function () {
       console.log(Food.save(food));
     });
@@ -412,6 +414,19 @@ Ang.controller('MainController', function ($scope, $http) {
       var user = User.find(App.other_user_id);
       user.isNear = false;
     });
+
   });
+
+  App.on('piece.ejected', function () {
+    App.log('ejected');
+  });
+
+  App.on('other_user.near', function () {
+    App.log('near');
+  })
+
+  App.on('other_user.far', function () {
+    App.log('far');
+  })
 
 });
