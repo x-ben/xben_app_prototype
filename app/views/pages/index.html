@@ -1,76 +1,82 @@
-<div ng-controller="MainController">
-  <div ng-if="current_user">
-    <img ng-src="{{ current_user.avatar.thumbnail_url }}" width="26" height="26">
-    {{ current_user.name }}
+
+<div class="wrap" ng-controller="MainController">
+
+  <div class="header ex-boxSizing">
+    <p class="logo"><img src="/system/media/assets/logo.png" alt="X-Ben" width="100%"></p>
+    <p ng-if="selected" class="backBtn"><img src="/system/media/assets/backBtn.png" alt=""></p>
   </div>
 
-  <hr>
+  <div ng-if="!selected">
+
+    <div ng-if="current_user" class="currentUserProfile ex-boxSizing ex-clearfix">
+      <p class="currentUserThumb"><img ng-src="{{ current_user.avatar.thumbnail_url }}" width="35" height="35"></p>
+      <p class="currentUserName">{{ current_user.name }}</p>
+    </div>
+
+    <p class="contetsHead">
+      <img src="/system/media/assets/okazu.png" alt="今日のおかず" width="100%">
+    </p>
+
+  </div>
 
   <div ng-if="!selected">
-    <ul>
-      <li ng-repeat="food in foods track by $index" ng-click="select(food)">
-        <p>
-          <img ng-src="{{ food.user.avatar.thumbnail_url }}" width="26" height="26">
-          {{ food.user.name }}
-        </p>
+    <ul rn-carousel rn-carousel-buffered rn-carousel-indicator rn-carousel-control>
 
-        <p>{{ food.name }}</p>
-        <img ng-src="{{ food.thumbnail.medium_url }}">
-        <p>{{ food.description }}</p>
-        <hr>
+      <li ng-repeat="food in foods track by $index" ng-click="select(food)" class="'memberList ex-boxSizing'">
+
+        <!-- user list wrap -->
+        <div ng-class="[food.id]" class="memberContent">
+
+          <p class="userProfile ex-clearfix">
+            <span class="userThumb"><img ng-src="{{ food.user.avatar.thumbnail_url }}" width="34" height="34"></span>
+            <span class="userName">{{ food.user.name }}</span>
+          </p>
+
+          <p class="userFoodName">{{ food.name }}</p>
+
+          <p class="userFoodThumb ex-boxSizing"><img ng-src="{{ food.thumbnail.medium_url }}"></p>
+
+          <p class="userFoodDesc">{{ food.description }}</p>
+        </div>
+
       </li>
     </ul>
   </div>
 
   <div ng-if="selected">
-    <p><button ng-click="disselect()">BACK</button></p>
-
+    <p class="contetsHead">
+      <img src="/system/media/assets/okazu02.png" alt="おかず交換" width="100%">
+    </p>
     <ul>
       <li ng-repeat="food in deals track by $index">
         <div ng-if="food">
-          <div ng-unless="food.edjected">
-            <p>
-              <img ng-src="{{ food.user.avatar.thumbnail_url }}" width="26" height="26">
-              {{ food.user.name }}
+          <div class="memberContent">
+            <p class="userProfile ex-clearfix">
+              <span class="userThumb"><img ng-src="{{ food.user.avatar.thumbnail_url }}" width="34" height="34"></span>
+              <span class="userName">{{ food.user.name }}</span>
             </p>
-
-            <p>
-              {{ food.name }}
-              <button ng-click="like(food.id)">{{ food.likes_count }} Likes</button>
-            </p>
-
-            <img ng-src="{{ food.thumbnail.medium_url }}">
-            <p>{{ food.description }}</p>
+            <p class="userFoodName" ng-show="$index == 0">{{ food.name }}</p>
+            <p class="userFoodThumb ex-boxSizing" ng-show="$index == 0"><img ng-src="{{ food.thumbnail.medium_url }}"></p>
+            <p class="userFoodDesc" ng-show="$index == 0">{{ food.description }}</p>
           </div>
-
-          <div ng-if="food.edjected">
-            取り外されています
-          </div>
+          <p class="dealIcon" ng-show="$index == 0"><img src="/system/media/assets/dealIcon.png" alt=""></p>
         </div>
 
-        <div ng-if="food == null">
-          待ち
+        <div ng-if="food == null" class="dealRequestLoading footerBoard">
+          <img src="/system/media/assets/loading_anime01.gif" alt="リクエスト中">
         </div>
-
-        <hr>
       </li>
     </ul>
 
-    <div ng-if="dealConcluded">
+    <!-- <div ng-if="food.edjected" class="removeLoading footerBoard">
+      <img src="/system/media/assets/loading_anime02.gif" alt="取り外し中">
+    </div>-->
 
-      <ul>
-        <li ng-repeat="comment in comments">
-          <p>{{ comment.body }}</p>
-          <p>by {{ comment.user.name }}</p>
-
-          <hr>
-        </li>
-      </ul>
-
-      <textarea cols="30" rows="10" ng-model="newComment.body"></textarea>
-      <button ng-click="createComment()">Submit</button>
-
-    </div>
+    <!-- <div ng-if="dealConcluded" class="footerBoard">
+      <button>
+        <img src="/system/media/assets/umaineBtn.png" alt="">
+      </button>
+    </div>-->
 
   </div>
 </div>
