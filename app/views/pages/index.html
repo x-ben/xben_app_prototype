@@ -2,8 +2,8 @@
 <div class="wrap" ng-controller="MainController">
 
   <div class="header ex-boxSizing">
-    <p class="logo"><img src="/system/media/assets/logo.png" alt="X-Ben" width="100%"></p>
-    <p ng-if="selected" class="backBtn"><img src="/system/media/assets/backBtn.png" alt=""></p>
+    <p class="logo"><img src="/assets/logo.png" alt="X-Ben" width="100%"></p>
+    <p ng-if="selected" class="backBtn"><img src="/assets/backBtn.png" alt=""></p>
   </div>
 
   <div ng-if="!selected">
@@ -14,7 +14,7 @@
     </div>
 
     <p class="contetsHead">
-      <img src="/system/media/assets/okazu.png" alt="今日のおかず" width="100%">
+      <img src="/assets/okazu.png" alt="今日のおかず" width="100%">
     </p>
 
   </div>
@@ -45,7 +45,7 @@
 
   <div ng-if="selected">
     <p class="contetsHead">
-      <img src="/system/media/assets/okazu02.png" alt="おかず交換" width="100%">
+      <img src="/assets/okazu02.png" alt="おかず交換" width="100%">
     </p>
     <ul>
       <li ng-repeat="food in deals track by $index">
@@ -59,22 +59,22 @@
             <p class="userFoodThumb ex-boxSizing" ng-show="$index == 0"><img ng-src="{{ food.thumbnail.medium_url }}"></p>
             <p class="userFoodDesc" ng-show="$index == 0">{{ food.description }}</p>
           </div>
-          <p class="dealIcon" ng-show="$index == 0"><img src="/system/media/assets/dealIcon.png" alt=""></p>
+          <p class="dealIcon" ng-show="$index == 0"><img src="/assets/dealIcon.png" alt=""></p>
         </div>
 
         <div ng-if="food == null" class="dealRequestLoading footerBoard">
-          <img src="/system/media/assets/loading_anime01.gif" alt="リクエスト中">
+          <img src="/assets/loading_anime01.gif" alt="リクエスト中">
         </div>
       </li>
     </ul>
 
     <!-- <div ng-if="food.edjected" class="removeLoading footerBoard">
-      <img src="/system/media/assets/loading_anime02.gif" alt="取り外し中">
+      <img src="/assets/loading_anime02.gif" alt="取り外し中">
     </div>-->
 
     <!-- <div ng-if="dealConcluded" class="footerBoard">
       <button>
-        <img src="/system/media/assets/umaineBtn.png" alt="">
+        <img src="/assets/umaineBtn.png" alt="">
       </button>
     </div>-->
 

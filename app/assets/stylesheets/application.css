@@ -85,7 +85,6 @@ button {
   margin: 7px auto 0 auto;
   text-align: center;
   box-shadow: 0 1px 0 white;
-  box-shadow: 0 1px 0 white;
   border-bottom: 1px solid #C4C4C4;
 }
 
@@ -178,12 +177,13 @@ button {
 }
 
 .footerBoard {
-  position: absolute;
-  width: 100%;
-  left: 0;
+  position: fixed;
+  width: 320px;
+  left: 50%;
   bottom: 0;
   height: 110px;
   background: rgba(0,0,0,.7);
+  margin-left: -160px;
 }
 .footerBoard button {
   width: 200px;
@@ -195,15 +195,20 @@ button {
   font-size: 0;
   line-height: 0;
   overflow: visible;
-  cursor: pointer;
-  margin: 10px 19%;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  margin-left: -100px;
   background: rgb(255, 255, 255);
   border-radius: 20px;
   border-bottom: 4px solid #A29B9B;
 }
 .footerBoard img {
   width: 90px;
-  margin: 10px 35%;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  margin-left: -45px;
 }
 
 /* ng-carrousel */
