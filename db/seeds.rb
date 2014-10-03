@@ -7,14 +7,14 @@ users_attributes = [
     food:       '肉じゃが',
   },
   {
-    name:       '今西智',
-    konashi_id: 'konashi#0-0000',
-    food:       'おかずのり',
-  },
-  {
     name:       '長野光',
     konashi_id: 'konashi#4-1591', # FIXME
     food:       'チャーシュー',
+  },
+  {
+    name:       '今西智',
+    konashi_id: 'konashi#0-0000',
+    food:       'おかずのり',
   },
   {
     name:       '中澤優子',

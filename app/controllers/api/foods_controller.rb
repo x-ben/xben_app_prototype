@@ -7,7 +7,7 @@ class Api::FoodsController < Api::ApplicationController
         { user: [:avatar] },
       )
       .where(Food.arel_table[:user_id].not_eq(current_user.id))
-      .order(created_at: :desc)
+      .order('rand()')
 
     render_json { |t|
       t[].foods!(@foods) { |food|
