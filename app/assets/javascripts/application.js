@@ -343,12 +343,12 @@ Ang.controller('MainController', function ($scope, $http) {
     $scope.state = 'initial';
   };
 
+  $scope.isState = function (state) {
+    return state == $scope.state;
+  };
+
   App.on('deal.request', function (e, food) {
     alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
-
-    $scope.$apply(function () {
-      $scope.state = 'request';
-    });
   });
 
   App.on('deal.accept', function (e, foods) {
@@ -359,15 +359,7 @@ Ang.controller('MainController', function ($scope, $http) {
     console.log(foods);
 
     $scope.$apply(function () {
-
-      if (foods[0] == $scope.selected) {
-        $scope.deals[1] = foods[1];
-      } else {
-        $scope.deals[1] = foods[0];
-      }
-
-      $scope.dealAccepted = true;
-      $scope.state = 'accept';
+      $scope.deals[1] = foods[+(foods[0] == $scope.selected)];
     });
   });
 
@@ -386,7 +378,7 @@ Ang.controller('MainController', function ($scope, $http) {
     App.log('inserted');
 
     $scope.$apply(function () {
-      $scope.state = 'inserted';
+      $scope.state = 'done';
     });
   });
 
@@ -402,8 +394,10 @@ Ang.controller('MainController', function ($scope, $http) {
     App.log('near');
 
     $scope.$apply(function () {
-      var user = User.find(App.other_user_id);
-      user.isNear = true;
+      User.save({
+        id:      App.other_user_id,
+        is_near: true
+      });
     });
   });
 
@@ -411,22 +405,11 @@ Ang.controller('MainController', function ($scope, $http) {
     App.log('far');
 
     $scope.$apply(function () {
-      var user = User.find(App.other_user_id);
-      user.isNear = false;
+      User.save({
+        id:      App.other_user_id,
+        is_near: false
+      });
     });
-
   });
-
-  App.on('piece.ejected', function () {
-    App.log('ejected');
-  });
-
-  App.on('other_user.near', function () {
-    App.log('near');
-  })
-
-  App.on('other_user.far', function () {
-    App.log('far');
-  })
 
 });

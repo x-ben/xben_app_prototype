@@ -1,4 +1,3 @@
-
 <div class="wrap" ng-controller="MainController">
 
   <div class="header ex-boxSizing">
@@ -6,7 +5,7 @@
     <p ng-if="selected" class="backBtn"><img src="/assets/backBtn.png" alt=""></p>
   </div>
 
-  <div ng-if="!selected">
+  <div ng-if="isState('initial')">
 
     <div ng-if="current_user" class="currentUserProfile ex-boxSizing ex-clearfix">
       <p class="currentUserThumb"><img ng-src="{{ current_user.avatar.thumbnail_url }}" width="35" height="35"></p>
@@ -19,7 +18,7 @@
 
   </div>
 
-  <div ng-if="!selected">
+  <div ng-if="isState('initial')">
     <ul rn-carousel rn-carousel-buffered rn-carousel-indicator rn-carousel-control>
 
       <li ng-repeat="food in foods track by $index" ng-click="select(food)" class="'memberList ex-boxSizing'">
@@ -43,7 +42,7 @@
     </ul>
   </div>
 
-  <div ng-if="selected">
+  <div ng-if="isState('selected') || isState('ejected') || isState('done')">
     <p class="contetsHead">
       <img src="/assets/okazu02.png" alt="おかず交換" width="100%">
     </p>
@@ -68,15 +67,15 @@
       </li>
     </ul>
 
-    <!-- <div ng-if="food.edjected" class="removeLoading footerBoard">
+    <div ng-if="isState('ejected')" class="removeLoading footerBoard">
       <img src="/assets/loading_anime02.gif" alt="取り外し中">
-    </div>-->
+    </div>
 
-    <!-- <div ng-if="dealConcluded" class="footerBoard">
+    <div ng-if="isState('done')" class="footerBoard">
       <button>
         <img src="/assets/umaineBtn.png" alt="">
       </button>
-    </div>-->
+    </div>
 
   </div>
 </div>
