@@ -164,10 +164,11 @@ window.SMA = (function () {
 ==============================================================================================*/
 window.Konashi = (function () {
 
-  var NUM_HIST = 4;
+  var NUM_HIST = 5;
   var PIN_MODE = parseInt('11111110', 2);
   var TICK_INTERVAL = 350;
 
+  var ARD_SIG_RESET        = 0;  // 初期化
   var ARD_SIG_DEAL_REQUEST = 1;  // はなれた場所で欲しい「おかず」リクエスト
   var ARD_SIG_DEAL_ACCEPT  = 2;  // はなれた場所で交換承認
   var ARD_SIG_APPROACH     = 3;  // 出逢う
@@ -197,12 +198,20 @@ window.Konashi = (function () {
     this.k.updatePioInput(this.updatePioInput.bind(this));
 
     App.on('deal.request', function (e, food) {
-      this.k.uartWrite(ARD_SIG_DEAL_REQUEST);
+      this.sendToArduino(ARD_SIG_DEAL_REQUEST);
     }.bind(this));
 
     App.on('deal.accept', function (e, foods) {
-      this.k.uartWrite(ARD_SIG_DEAL_ACCEPT);
+      this.sendToArduino(ARD_SIG_DEAL_ACCEPT);
     }.bind(this));
+
+    App.on('arduino.reset', function () {
+      this.sendToArduino(ARD_SIG_RESET);
+    }.bind(this));
+
+    $(document).on('touchmove', function (e) {
+      App.log(JSON.stringify(e));
+    });
   };
 
   $$.connected = function () {
@@ -225,14 +234,19 @@ window.Konashi = (function () {
     this.k.signalStrengthReadRequest();
   };
 
+  $$.sendToArduino = function (signal) {
+    this.k.uartWrite(String(signal).charCodeAt(0));
+    this.k.uartWrite('\n'.charCodeAt(0));
+  };
+
   $$.updatePioInput = function (data) {
     App.log('pio input: ', data);
 
     switch (data) {
-      case 3:
+      case 0:
         this.inserted();
         break;
-      case 2:
+      case 1:
         this.ejected();
         break;
     }
@@ -244,15 +258,15 @@ window.Konashi = (function () {
     this.signalSMA.add(strength);
 
     var avg = this.signalSMA.getAverage() | 0;
-    var isNear = avg < 70;
+    var isNear = avg < 65;
 
-    // App.log({ raw: strength, avg: avg });
+    // App.log(JSON.stringify({ raw: strength, avg: avg }));
 
     if (isNear != this.isNear) {
       this.isNear = isNear;
 
       if (this.isNear) {
-        this.k.uartWrite(ARD_SIG_APPROACH);
+        this.sendToArduino(ARD_SIG_APPROACH);
         App.trigger('other_user.near');
       } else {
         App.trigger('other_user.far');
@@ -312,6 +326,8 @@ window.Food = Model();
 ==============================================================================================*/
 Ang.controller('MainController', function ($scope, $http, $timeout) {
 
+  var timer = null;
+
   $scope.state = 'initial';
 
   $http.get('/api/user').success(function (data) {
@@ -339,9 +355,14 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
   };
 
   $scope.back = function () {
+    Deal.reset();
+    App.trigger('arduino.reset');
     $scope.selected = null;
     $scope.state = 'initial';
-    Deal.reset();
+
+    if (timer != null) {
+      resetTimeout(timer);
+    }
   };
 
   $scope.isState = function (state) {
@@ -393,8 +414,14 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     App.log('inserted');
 
     $scope.$apply(function () {
-      $scope.state = 'done';
+      $scope.state = 'inserted';
     });
+
+    timer = setTimeout(function () {
+      $scope.$apply(function () {
+        $scope.state = 'done';
+      });
+    }, 10 * 1000);
   });
 
   App.on('piece.ejected', function () {
