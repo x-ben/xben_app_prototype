@@ -72,7 +72,7 @@
       <img src="/assets/loading_anime02.gif" alt="取り外し中">
     </div>
 
-    <div ng-if="isState('done')" class="footerBoard">
+    <!-- <div ng-if="isState('done')" class="footerBoard"> -->
 
     <div class="umaineBg">
 
@@ -83,11 +83,18 @@
       <ul>
       <li ng-repeat="food in deals track by $index">
         <span class="likeCount" ng-show="$index == 0">{{food.likes_count}}</span>
-        <div ng-click="like(selected.id)" ng-class="{liked: flag}" class="umaineFood" style="background:url('{{ food.thumbnail.medium_url }}');background-size:cover;"><p class="umaineIcon"><img src="/assets/umaineBtn.png" alt=""></p></div>
+          <div ng-click="like(selected.id)" ng-class="{liked: flag}" class="umaineFood" style="background:url('{{ food.thumbnail.medium_url }}');background-size:cover;">
+            <p class="umaineIcon">
+              <img src="/assets/umaineBtn.png" alt="">
+            </p>
+          </div>
       </li>
     </ul>
 
     </div>
 
   </div>
+
+
 </div>
+<audio src="/assets/umaine.mp4" id="umaineVoice"></audio>

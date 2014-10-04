@@ -410,6 +410,11 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     }, 1000);
 
     $scope.pop = ($scope.pop + 1) % 3;
+
+
+    var uv = $('#umaineVoice');
+    uv.get(0).play();
+
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
@@ -463,3 +468,7 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
   });
 
 });
+
+
+
+
