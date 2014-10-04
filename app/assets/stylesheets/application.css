@@ -73,6 +73,8 @@ button {
   color: white;
   z-index: 100;
   /*-webkit-animation: anime1 1s 1s ease infinite alternate;*/
+}
+.header .alert.show {
   -webkit-animation: anime1 5s ease;
   -webkit-animation-fill-mode:forwards;
 }
@@ -218,7 +220,7 @@ button {
   width: 320px;
   bottom: -100%;
   height: 110px;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(100%,rgba(255,255,255,1)));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.4)), color-stop(100%,rgba(255,255,255,1)));
   height: 100%;
   -webkit-animation: anime2 0.5s 1s ease;
   -webkit-animation-fill-mode:forwards;
@@ -294,3 +296,119 @@ button {
   color:#444;
   font-size: 12px;
 }
+
+.umaineFood {
+  width: 240px;
+  height: 240px;
+  background-size: cover;
+  border-radius: 200px;
+  margin: 0 auto 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -120px;
+  margin-top: -120px;
+}
+.umaineFood .umaineIcon {
+  width: 170px;
+  margin: auto;
+  line-height: 12.5;
+}
+.umaineFood .umaineIcon img {
+  width: 100%;
+}
+.liked {
+  top: 51%;
+}
+
+.umainePop_prototype {
+  width: 140px;
+  height: 40px;
+  padding-top: 10px;
+  background: white;
+  padding: 5px;
+  border-radius: 30px;
+  position: absolute;
+  text-align: center;
+}
+.ins1 {
+  top: 30%;
+  left: 12%;
+  z-index: 100;
+  opacity: 0;
+}
+.ins2 {
+  top: 20%;
+  left: 50%;
+  z-index: 110;
+  opacity: 0;
+}
+.ins3 {
+  top: 10%;
+  left: 7%;
+  z-index: 120;
+  opacity: 0;
+}
+.ins1_anime {
+  -webkit-animation: popAnime1 1s ease;
+}
+  @-webkit-keyframes popAnime1 {
+      0% { opacity: 0;}
+      50% { opacity: 1;}
+      100% { opacity: 0; }
+  }
+.ins2_anime {
+  -webkit-animation: popAnime2 1s ease;
+}
+  @-webkit-keyframes popAnime2 {
+      0% { opacity: 0;}
+      50% { opacity: 1;}
+      100% { opacity: 0; }
+  }
+.ins3_anime {
+  -webkit-animation: popAnime3 1s ease;
+}
+  @-webkit-keyframes popAnime3 {
+      0% { opacity: 0;}
+      50% { opacity: 1;}
+      100% { opacity: 0; }
+  }
+
+.likeCount {
+  font-size: 80px;
+  font-weight: bold;
+  color: rgb(255, 112, 0);
+  opacity: 0.9;
+  position: absolute;
+  top: 60px;
+  left: 80px;
+}
+
+.color-a {
+  background: rgb(197, 45, 45) !important;
+  border-bottom: 1px solid white;
+}
+.color-b {
+  background: rgb(45, 106, 197) !important;
+  border-bottom: 1px solid white;
+}
+.near {
+  background: white;
+  position: absolute;
+  top: 20px;
+  right: 21px;
+  padding: 7px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  color: rgb(255, 82, 0);
+  -webkit-animation: animeBlink 0.5s ease infinite alternate;
+}
+  @-webkit-keyframes animeBlink {
+      0% { opacity: 0;}
+      100% { opacity: 1; }
+  }
+
+
+
+
+

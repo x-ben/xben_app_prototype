@@ -379,7 +379,7 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
 
     $timeout(function () {
       $scope.request = null;
-    }, 1000);
+    }, 5000);
     // alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
   });
 
