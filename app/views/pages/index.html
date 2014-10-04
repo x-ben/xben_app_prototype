@@ -1,6 +1,7 @@
 <div class="wrap" ng-controller="MainController">
 
   <div class="header ex-boxSizing">
+    <p class="alert ex-boxSizing">food.user.nameさんが、<br>food.nameを食べたいと言っています！</p>
     <p class="logo"><img src="/assets/logo.png" alt="X-Ben" width="100%"></p>
     <p ng-if="!isState('initial')" ng-click="back()" class="backBtn"><img src="/assets/backBtn.png" alt=""></p>
   </div>
@@ -24,17 +25,17 @@
       <li ng-repeat="food in foods track by $index" ng-click="select(food)" class="'memberList ex-boxSizing'">
 
         <!-- user list wrap -->
-        <div ng-class="[food.id]" class="memberContent">
+        <div class="memberContent">
+
+          <p ng-class="{near: is_near}" ng-show="is_near">near</p>
 
           <p class="userProfile ex-clearfix">
             <span class="userThumb"><img ng-src="{{ food.user.avatar.thumbnail_url }}" width="34" height="34"></span>
             <span class="userName">{{ food.user.name }}</span>
           </p>
 
-          <p class="userFoodName">{{ food.name }}</p>
-
-          <p class="userFoodThumb ex-boxSizing"><img ng-src="{{ food.thumbnail.medium_url }}"></p>
-
+          <p class="userFoodThumb ex-boxSizing" style="background:url('{{ food.thumbnail.medium_url }}');height:140px;background-size:cover;"></p>
+          <p class="userFoodName"><span><img src="/assets/foodIcon.png" width="15px"></span>&nbsp;{{ food.name }}</p>
           <p class="userFoodDesc">{{ food.description }}</p>
         </div>
 
@@ -55,7 +56,7 @@
               <span class="userName">{{ food.user.name }}</span>
             </p>
             <p class="userFoodName" ng-show="$index == 0">{{ food.name }}</p>
-            <p class="userFoodThumb ex-boxSizing" ng-show="$index == 0"><img ng-src="{{ food.thumbnail.medium_url }}"></p>
+            <p class="userFoodThumb ex-boxSizing" ng-show="$index == 0" style="background:url('{{ food.thumbnail.medium_url }}');height:140px;background-size:cover;"></p>
             <p class="userFoodDesc" ng-show="$index == 0">{{ food.description }}</p>
           </div>
           <p class="dealIcon" ng-show="$index == 0"><img src="/assets/dealIcon.png" alt=""></p>
@@ -67,14 +68,104 @@
       </li>
     </ul>
 
-    <div ng-if="isState('ejected')" class="removeLoading footerBoard">
+    <!-- <div ng-if="isState('ejected')" class="removeLoading footerBoard">
       <img src="/assets/loading_anime02.gif" alt="取り外し中">
-    </div>
+    </div> -->
 
-    <div ng-if="isState('done')" class="footerBoard">
-      <button ng-click="like(selected.id)">
-        <img src="/assets/umaineBtn.png" alt="">
-      </button>
+    <!-- <div ng-if="isState('done')" class="footerBoard"> -->
+
+    <style>
+    .umaineFood {
+      width: 240px;
+      height: 240px;
+      background-size: cover;
+      border-radius: 200px;
+      margin: 0 auto 0 auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -120px;
+      margin-top: -120px;
+    }
+    .umaineFood .umaineIcon {
+      width: 150px;
+      margin: auto;
+      line-height: 12;
+    }
+    .umaineFood .umaineIcon img {
+      width: 100%;
+    }
+    .liked {
+      top: 51%;
+    }
+
+    .umainePop_prototype {
+      width: 140px;
+      height: 40px;
+      padding-top: 10px;
+      background: white;
+      padding: 5px;
+      border-radius: 30px;
+      position: absolute;
+      text-align: center;
+    }
+    .ins1 {
+      top: 30%;
+      left: 12%;
+      z-index: 100;
+      opacity: 0;
+    }
+    .ins2 {
+      top: 20%;
+      left: 50%;
+      z-index: 110;
+      opacity: 0;
+    }
+    .ins3 {
+      top: 10%;
+      left: 7%;
+      z-index: 120;
+      opacity: 0;
+    }
+    .ins1_anime {
+      -webkit-animation: popAnime1 1s ease;
+    }
+      @-webkit-keyframes popAnime1 {
+          0% { opacity: 0;}
+          50% { opacity: 1;}
+          100% { opacity: 0; }
+      }
+    .ins2_anime {
+      -webkit-animation: popAnime2 1s ease;
+    }
+      @-webkit-keyframes popAnime2 {
+          0% { opacity: 0;}
+          50% { opacity: 1;}
+          100% { opacity: 0; }
+      }
+    .ins3_anime {
+      -webkit-animation: popAnime3 1s ease;
+    }
+      @-webkit-keyframes popAnime3 {
+          0% { opacity: 0;}
+          50% { opacity: 1;}
+          100% { opacity: 0; }
+    }
+    </style>
+
+    <div class="umaineBg">
+
+      <p ng-class="{ins1_anime: pop >= 0}" class="umainePop_prototype ins1"><img src="/assets/umaine.png" width="100"></p>
+      <p ng-class="{ins2_anime: pop >= 1}" class="umainePop_prototype ins2"><img src="/assets/umaine.png" width="100"></p>
+      <p ng-class="{ins3_anime: pop >= 2}" class="umainePop_prototype ins3"><img src="/assets/umaine.png" width="100"></p>
+
+      <ul>
+      <li ng-repeat="food in deals track by $index">
+        <!-- <span ng-show="$index == 0">{{food.likes_count}}</span> -->
+        <div ng-click="like(selected.id)" ng-class="{liked: flag}" class="umaineFood" style="background:url('{{ food.thumbnail.medium_url }}');background-size:cover;"><p class="umaineIcon"><img src="/assets/umaineBtn.png" alt=""></p></div>
+      </li>
+    </ul>
+
     </div>
 
   </div>
