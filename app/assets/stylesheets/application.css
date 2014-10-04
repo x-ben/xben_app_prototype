@@ -73,7 +73,7 @@ button {
   color: white;
   z-index: 100;
   /*-webkit-animation: anime1 1s 1s ease infinite alternate;*/
-  -webkit-animation: anime1 5s 1s ease;
+  -webkit-animation: anime1 5s ease;
   -webkit-animation-fill-mode:forwards;
 }
   @-webkit-keyframes anime1 {
