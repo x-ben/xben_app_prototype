@@ -27,9 +27,9 @@
         <!-- user list wrap -->
         <div class="memberContent">
 
-          <p ng-class="{near: is_near}" ng-show="is_near">near</p>
+          <p ng-class="{near: food.user.is_near}" ng-show="food.user.is_near">near</p>
 
-          <p class="userProfile ex-clearfix">
+          <p class="userProfile ex-clearfix color-{{ [null, 'a', 'b'][food.user.id] }}">
             <span class="userThumb"><img ng-src="{{ food.user.avatar.thumbnail_url }}" width="34" height="34"></span>
             <span class="userName">{{ food.user.name }}</span>
           </p>
