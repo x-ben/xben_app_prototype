@@ -1,7 +1,7 @@
 <div class="wrap" ng-controller="MainController">
 
   <div class="header ex-boxSizing">
-    <p class="alert ex-boxSizing">food.user.nameさんが、<br>food.nameを食べたいと言っています！</p>
+    <p class="alert ex-boxSizing" ng-class="{ show: !!request }">{{ request.user.name }}さんが、<br>{{ request.name }}を食べたいと言っています！</p>
     <p class="logo"><img src="/assets/logo.png" alt="X-Ben" width="100%"></p>
     <p ng-if="!isState('initial')" ng-click="back()" class="backBtn"><img src="/assets/backBtn.png" alt=""></p>
   </div>
