@@ -3,12 +3,12 @@ IMAGES_PATH = Rails.root.join('spec', 'supports', 'images')
 users_attributes = [
   {
     name:       '浜谷光吉',
-    konashi_id: 'konashi#4-1598', # FIXME
+    konashi_id: 'konashi#4-1598',
     food:       '肉じゃが',
   },
   {
     name:       '永野光',
-    konashi_id: 'konashi#4-1591', # FIXME
+    konashi_id: 'konashi#4-1591',
     food:       'チャーシュー',
   },
   {
@@ -22,7 +22,7 @@ users_attributes = [
     food:       'パンケーキ',
   },
   {
-    name:       '野木将兵',
+    name:       '乃木翔平',
     konashi_id: 'konashi#0-0000',
     food:       '梅紫蘇ロールとんかつ',
   },
