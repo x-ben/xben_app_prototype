@@ -310,7 +310,7 @@ window.Food = Model();
 
 /*=== Main
 ==============================================================================================*/
-Ang.controller('MainController', function ($scope, $http) {
+Ang.controller('MainController', function ($scope, $http, $timeout) {
 
   $scope.state = 'initial';
 
@@ -364,8 +364,22 @@ Ang.controller('MainController', function ($scope, $http) {
     });
   });
 
+  $scope.pop = 4;
+
   $scope.like = function (id) {
     $http.post('/api/foods/' + id + '/like');
+    $scope.flag = !$scope.flag;
+
+    $timeout(function () {
+      $scope.flag = false;
+    }, 100);
+
+    $timeout(function () {
+      $scope.pop = 4;
+    }, 1000);
+
+    $scope.pop = ($scope.pop + 1) % 3;
+
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
@@ -396,7 +410,7 @@ Ang.controller('MainController', function ($scope, $http) {
 
     $scope.$apply(function () {
       User.save({
-        id:      App.other_user_id,
+        id: App.other_user_id,
         is_near: true
       });
     });
@@ -407,7 +421,7 @@ Ang.controller('MainController', function ($scope, $http) {
 
     $scope.$apply(function () {
       User.save({
-        id:      App.other_user_id,
+        id: App.other_user_id,
         is_near: false
       });
     });
