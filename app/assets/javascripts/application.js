@@ -209,9 +209,12 @@ window.Konashi = (function () {
       this.sendToArduino(ARD_SIG_RESET);
     }.bind(this));
 
+    /*
     $(document).on('touchmove', function (e) {
-      App.log(JSON.stringify(e));
+      e = e.originalEvent;
+      App.log(e.pageX, e.pageY);
     });
+    */
   };
 
   $$.connected = function () {
@@ -370,7 +373,14 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
   };
 
   App.on('deal.request', function (e, food) {
-    alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
+    $scope.$apply(function () {
+      $scope.request = food;
+    });
+
+    $timeout(function () {
+      $scope.request = null;
+    }, 1000);
+    // alert(food.user.name + 'さんが、' + food.name + 'を食べたいと言っています！');
   });
 
   App.on('deal.accept', function (e, foods) {
@@ -400,11 +410,9 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     }, 1000);
 
     $scope.pop = ($scope.pop + 1) % 3;
-
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
-
     $scope.$apply(function () {
       console.log(Food.save(food));
     });
