@@ -209,9 +209,12 @@ window.Konashi = (function () {
       this.sendToArduino(ARD_SIG_RESET);
     }.bind(this));
 
+    /*
     $(document).on('touchmove', function (e) {
-      App.log(JSON.stringify(e));
+      e = e.originalEvent;
+      App.log(e.pageX, e.pageY);
     });
+    */
   };
 
   $$.connected = function () {
