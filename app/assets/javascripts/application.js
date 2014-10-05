@@ -42,7 +42,9 @@ window.App = (function () {
   };
 
   $$.log = function () {
-    this.channel.trigger('console.log', toArray(arguments));
+    var args = toArray(arguments);
+    args.unshift(this.current_user_id);
+    this.channel.trigger('console.log', args);
   };
 
   $$.trigger = function () {
@@ -215,6 +217,12 @@ window.Konashi = (function () {
       App.log(e.pageX, e.pageY);
     });
     */
+
+    App.channel.bind('food.update_likes_count', function (food) {
+      if (food.user_id != App.current_user_id) {
+        this.sendToArduino(ARD_SIG_LIKE);
+      }
+    }.bind(this));
   };
 
   $$.connected = function () {
@@ -246,10 +254,10 @@ window.Konashi = (function () {
     App.log('pio input: ', data);
 
     switch (data) {
-      case 0:
+      case 1:
         this.inserted();
         break;
-      case 1:
+      case 0:
         this.ejected();
         break;
     }
@@ -391,11 +399,13 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     console.log(foods);
 
     $scope.$apply(function () {
-      $scope.deals[1] = foods[+(foods[0] == $scope.selected)];
+      $scope.deals = [$scope.selected, foods[+(foods[0] == $scope.selected)]];
     });
   });
 
   $scope.pop = 4;
+
+  var uv = null;
 
   $scope.like = function (id) {
     $http.post('/api/foods/' + id + '/like');
@@ -412,9 +422,13 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     $scope.pop = ($scope.pop + 1) % 3;
 
 
-    var uv = $('#umaineVoice');
-    uv.get(0).play();
+    if (!uv) {
+      uv = document.getElementById('umaineVoice');
+    }
 
+    setTimeout(function () {
+      uv.play();
+    }, 16);
   };
 
   App.channel.bind('food.update_likes_count', function (food) {
@@ -427,14 +441,8 @@ Ang.controller('MainController', function ($scope, $http, $timeout) {
     App.log('inserted');
 
     $scope.$apply(function () {
-      $scope.state = 'inserted';
+      $scope.state = 'done';
     });
-
-    timer = setTimeout(function () {
-      $scope.$apply(function () {
-        $scope.state = 'done';
-      });
-    }, 10 * 1000);
   });
 
   App.on('piece.ejected', function () {
