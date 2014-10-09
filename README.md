@@ -1,14 +1,14 @@
-Bocchi-meshi Bokumetsu Bento-bako
-=================================
+X Ben App (prototype)
+=====================
 
-> You'll never eat alone anymore
+> The next bento-box
 
 
 Setup
 -----
 
 ```sh
-$ git clone git@github.com:creasty/b3_prototype.git && cd dely
+$ git clone git@github.com:x-ben/xben_app_prototype.git && cd dely
 $ mysql.server start  # if need
 $ ./script/setup
 ```
